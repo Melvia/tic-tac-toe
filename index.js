@@ -1,4 +1,4 @@
-(() => {
+window.onload = () => {
   const cells = document.querySelectorAll(".game-field_cell");
 
   const cross = document.querySelector("#cross");
@@ -160,4 +160,4 @@
   });
   btnReset.addEventListener("click", handleReset);
   btnNewSize.addEventListener("click", handleNewSize);
-})();
+};

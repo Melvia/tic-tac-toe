@@ -9,7 +9,7 @@ window.onload = () => {
 
   const [x, o] = ["x", "o"];
 
-  //model
+  //состояние игры
   const gameState = {
     fields: ["", "", "", "", "", "", "", "", ""],
     currentPlayer: x,
@@ -85,22 +85,26 @@ window.onload = () => {
     return checkColumns() || checkRows() || checkDiagonal();
     return null;
   };
-  // view
+
+  //заполнение клеток
+  const viewField = (target) => {
+    if (gameState.fields[target.dataset.number - 1] === x)
+      target.classList.add("jedy");
+    if (gameState.fields[target.dataset.number - 1] === o)
+      target.classList.add("sith");
+  };
+
+  // закрашивание победных клеток
   const paintCells = (cells) => {
     cells.forEach((index) => {
       const field = document.querySelector(`[data-number='${index + 1}']`);
-      field.style.background = "purple";
+      const winnerClassList =
+        gameState.currentPlayer === x ? "winner-jedy" : "winner-sith";
+      field.classList.add(winnerClassList);
     });
   };
 
-  const clearCells = (cells) => {
-    cells.forEach((index) => {
-      const field = document.querySelector(`[data-number='${index + 1}']`);
-      field.style.background = "white";
-    });
-  };
-
-  //controller
+  //обработка клика по кнопке
   const clickCell = (e) => {
     if (gameState.winner) return;
     const cellNumber = e.target.dataset.number;
@@ -112,52 +116,37 @@ window.onload = () => {
       if (gameState.cellsWinner) {
         paintCells(gameState.cellsWinner);
         gameState.winner = gameState.currentPlayer;
-        winnerField.textContent = "Победили " + gameState.currentPlayer + "!";
+        const winnerName = gameState.currentPlayer === x ? "Джедаи" : "Ситхи";
+        winnerField.textContent = "Победили " + winnerName + "!";
       }
       gameState.currentPlayer = gameState.currentPlayer === x ? o : x;
     }
   };
 
-  //view
-  const viewField = (target) => {
-    function fillSymbol(object) {
-      const objectCopy = object.cloneNode(true);
-      objectCopy.style.height = "100%";
-      objectCopy.style.width = "100%";
-      target.append(objectCopy);
-    }
-
-    if (gameState.fields[target.dataset.number - 1] === x) fillSymbol(cross);
-    if (gameState.fields[target.dataset.number - 1] === o) fillSymbol(circle);
-  };
-
-  //кнопки
+  // очистка клеток
   const clearFields = () => {
-    //view
-    cells.forEach((cell) => (cell.innerHTML = ""));
-    winnerField.textContent = "";
-    //controller
-    clearCells(gameState.cellsWinner);
-    const newFields = gameState.fields.map(() => "");
-    gameState.fields = newFields;
+    cells.forEach((cell) => {
+      cell.innerHTML = "";
+      winnerField.textContent = "";
+      cell.classList.remove("sith");
+      cell.classList.remove("jedy");
+      cell.classList.remove("winner-sith");
+      cell.classList.remove("winner-jedy");
+    });
   };
 
+  //кнопка reset
   const handleReset = () => {
     clearFields();
+    const newFields = gameState.fields.map(() => "");
+    gameState.fields = newFields;
     gameState.currentPlayer = x;
     gameState.winner = null;
   };
 
-  const handleNewSize = () => {
-    cells.forEach((cell) => (cell.innerHTML = ""));
-    gameState.fields.map((field) => {
-      field = "";
-    });
-  };
-
+  //привязка обработчиков
   cells.forEach((cell) => {
     cell.addEventListener("click", clickCell);
   });
   btnReset.addEventListener("click", handleReset);
-  btnNewSize.addEventListener("click", handleNewSize);
 };
